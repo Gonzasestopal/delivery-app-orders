@@ -6,23 +6,25 @@
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Deployment](#deployment)
 
 ## Prerequisites
 
-  - Make sure you have https://github.com/Gonzasestopal/delivery-app-db-layer running.
+  - Make sure you have `https://github.com/Gonzasestopal/delivery-app-db-layer` running.
 
 ## Installation
 
 - Run `npm install` to install dependencies.
 
 ## Usage
+
 - Run `npm run server` to start the local development server.
 
-## Migrations
+## Deployment
 
-- Run `knex migrate:rollback` to reset any previous changes.
-- Run `knex migrate:latest` to setup the migration file.
-- Run `knex seed:run` to populate the sample seed data.
+- Run `docker build . -t delivery-app-orders`
+
+- Config container into any provider.
 
 # API Documentation
 
