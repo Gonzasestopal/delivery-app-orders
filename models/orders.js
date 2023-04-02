@@ -5,7 +5,8 @@ module.exports = {
     findById,
     add,
     edit,
-    remove
+    remove,
+    findAllByUserId
 }
 
 function find() {
@@ -26,4 +27,9 @@ function edit(id, item) {
 
 function remove(id) {
     return db('orders').del().where('id', id)
+}
+
+
+function findAllByUserId(userId) {
+    return db('orders').where('user_id', userId);
 }

@@ -3,6 +3,7 @@ const db = require('../api/db-config.js');
 module.exports = {
     find,
     findById,
+    findAllByMealId,
     add,
     edit,
     remove
@@ -26,4 +27,8 @@ function edit(id, item) {
 
 function remove(id) {
     return db('meal_options').del().where('id', id)
+}
+
+function findAllByMealId(mealId) {
+    return db('meal_options').whereIn('meal_id', mealId);
 }

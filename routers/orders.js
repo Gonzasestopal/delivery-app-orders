@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const orders = require('../models/orders.js');
 const meals = require('../models/meals.js');
+const mealOptions = require('../models/meal_options.js')
 const {
     validateItemId,
     validatePostReqBody,
@@ -93,7 +94,74 @@ router.post('/', verifyToken, (req, res) => {
         })
 })
 
-router.put('/:id/confirm', verifyToken, (req, res) => {
+router.post('/verify', verifyToken, (req, res) => {
+    const order_id = req.body.order_id
+    const tip = req.body.tip
+    const user_id = req.user.id
+
+    let meals_total = 0
+    let meal_options_total = 0
+    let subtotal = 0
+    let total = 0
+    let subtotal_tip = 0
+
+    if (!(order_id && tip)) {
+        res.status(400).send("All input is required");
+        return;
+    }
+
+    orders.findAllByUserId(user_id)
+        .then(orders => {
+            let mealIds = []
+            for (let order of orders) {
+                mealIds.push(order.meal_id)
+            }
+            return meals.findAll(mealIds)
+        })
+        .then(meals => {
+            let mealIds = []
+            for (let meal of meals) {
+                if (!meal.is_available) {
+                    throw new InvalidStatus()
+                }
+                mealIds.push(meal.id)
+                meals_total += meal.price
+            }
+            return mealOptions.findAllByMealId(mealIds)
+        })
+        .then(meal_options => {
+            for (let option of meal_options) {
+                if (!option.is_available) {
+                    throw new InvalidStatus()
+                }
+                meal_options_total += option.price
+            }
+
+            subtotal += meals_total + meal_options_total
+            subtotal_tip += subtotal * (tip / 100)
+            total += subtotal + subtotal_tip
+
+            res.status(201).json({
+                message: 'Successfully calculated total.',
+                meals_total: meals_total,
+                meal_options_total: meal_options_total,
+                subtotal: subtotal,
+                subtotal_with_tip: subtotal_tip,
+                total: total,
+            })
+        })
+        .catch(err => {
+            if (err.name == 'InvalidStatus') {
+                res.status(401).json({ message: 'Order cannot be confirmed.' })
+                return;
+            }
+            res.status(500).json({ message: 'Error updating the item.' })
+        })
+
+})
+
+
+router.post('/confirm', verifyToken, (req, res) => {
     const order_id = req.body.order_id
 
     if (!(order_id)) {
