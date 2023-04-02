@@ -179,3 +179,41 @@ Returns a success message:
 }
 ```
 
+
+## POST api/orders/verify
+
+Receives a request body:
+```json
+{
+    "order_id": 5,
+    "tip": 5
+}
+```
+
+Returns a success message with total, subtotal_tip, subtotal, meal_options_total, meals_totals:
+```json
+{
+    "message": "Successfully calculated total.",
+    "meals_total": 4475,
+    "meal_options_total": 390,
+    "subtotal": 4865,
+    "subtotal_with_tip": 243.25,
+    "total": 5108.25
+}
+```
+
+## POST api/orders/confirm
+
+Receives a request body:
+```json
+{
+    "payment_method": "credit"
+}
+```
+
+Returns a success message with total, subtotal_tip, subtotal, meal_options_total, meals_totals:
+```json
+{
+    "message": "Successfully confirmed the order",
+}
+```

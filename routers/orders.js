@@ -4,7 +4,6 @@ const meals = require('../models/meals.js');
 const mealOptions = require('../models/meal_options.js')
 const {
     validateItemId,
-    validatePostReqBody,
     verifyToken,
     isAdmin,
 } = require('../api/middleware.js')
@@ -162,33 +161,20 @@ router.post('/verify', verifyToken, (req, res) => {
 
 
 router.post('/confirm', verifyToken, (req, res) => {
-    const order_id = req.body.order_id
+    const address = req.body.address
+    const paymentMethod = req.body.payment_method
 
-    if (!(order_id)) {
+    if (!(address && paymentMethod)) {
         res.status(400).send("All input is required");
         return;
     }
 
-    orders.findById(order_id)
-        .then(item => {
-            if (item.status !== 'added') {
-                throw new InvalidStatus()
-            }
-            return orders.edit(item.id, { 'status': 'confirmed' })
-        })
-        .then(updatedItemId => {
-            [updatedItemId] = updatedItemId
-            return orders.findById(updatedItemId['id'])
-        })
-        .then(updated => {
-            res.status(201).json(updated)
+    orders.findAllByUserId(user_id)
+        .then(_ => {
+            res.status(200).json({ message: 'Successfully confirmed the order.' })
         })
         .catch(err => {
-            if (err.name == 'InvalidStatus') {
-                res.status(401).json({ message: 'Order cannot be confirmed.' })
-                return;
-            }
-            res.status(500).json({ message: 'Error updating the item.' })
+            res.status(500).json({ message: 'Error confirming the order.' })
         })
 
 })
