@@ -1,5 +1,5 @@
 const db = require('../api/db-config.js');
-const meals = require('../models/meals.js');
+const meals = require('../repositories/meals.js');
 const jwt = require('jsonwebtoken')
 
 

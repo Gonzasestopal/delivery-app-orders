@@ -1,7 +1,7 @@
 const router = require('express').Router();
-const orders = require('../models/orders.js');
-const meals = require('../models/meals.js');
-const mealOptions = require('../models/meal_options.js')
+const orders = require('../repositories/orders.js');
+const meals = require('../repositories/meals.js');
+const mealOptions = require('../repositories/meal_options.js')
 const {
 	validateItemId,
 	verifyToken,

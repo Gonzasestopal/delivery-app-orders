@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const mealOptions = require('../models/meal_options.js');
+const mealOptions = require('../repositories/meal_options.js');
 const {
     validateItemId,
     validatePostReqBody,
