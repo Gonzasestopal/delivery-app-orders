@@ -2,21 +2,22 @@ const router = require('express').Router();
 const meals = require('../models/meals.js');
 const {
   validateItemId,
-  validatePostReqBody
+  validatePostReqBody,
+  verifyToken,
+  isAdmin,
 } = require('../api/middleware.js')
 
-router.get('/', (req, res) => {
+router.get('/', verifyToken, (req, res) => {
   meals.find()
     .then(meals => {
       res.status(200).json(meals)
     })
     .catch(err => {
       res.status(500).json({ message: 'Error retrieving the items.' })
-      console.log(err)
     })
 })
 
-router.get('/:id', validateItemId, (req, res) => {
+router.get('/:id', isAdmin, validateItemId, (req, res) => {
   const id = req.params.id
   meals.findById(id)
     .then(item => {
@@ -24,16 +25,14 @@ router.get('/:id', validateItemId, (req, res) => {
     })
     .catch(err => {
       res.status(500).json({ message: 'Error retrieving the item.' })
-      console.log(err)
     })
 })
 
-router.post('/', validatePostReqBody, (req, res) => {
+router.post('/', isAdmin, validatePostReqBody, (req, res) => {
   const item = req.body
   meals.add(item)
     .then(id => {
       [newItemId] = id
-      console.group(newItemId)
       return meals.findById(newItemId['id'])
     })
     .then(item => {
@@ -44,7 +43,7 @@ router.post('/', validatePostReqBody, (req, res) => {
     })
 })
 
-router.put('/:id', validateItemId, (req, res) => {
+router.put('/:id', isAdmin, validateItemId, (req, res) => {
   const id = req.params.id
   const updated = req.body
   meals.edit(id, updated)
@@ -56,13 +55,11 @@ router.put('/:id', validateItemId, (req, res) => {
       res.status(201).json(updated)
     })
     .catch(err => {
-      console.log(err)
-
       res.status(500).json({ message: 'Error updating the item.' })
     })
 })
 
-router.delete('/:id', validateItemId, (req, res) => {
+router.delete('/:id', isAdmin, validateItemId, (req, res) => {
   const id = req.params.id
   meals.remove(id)
     .then(deleted => {

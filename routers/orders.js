@@ -2,10 +2,19 @@ const router = require('express').Router();
 const orders = require('../models/orders.js');
 const {
     validateItemId,
-    validatePostReqBody
+    validatePostReqBody,
+    verifyToken,
+    isAdmin,
 } = require('../api/middleware.js')
 
-router.get('/', (req, res) => {
+class InvalidStatus extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "InvalidStatus";
+    }
+}
+
+router.get('/', isAdmin, (req, res) => {
     orders.find()
         .then(orders => {
             res.status(200).json(orders)
@@ -16,7 +25,7 @@ router.get('/', (req, res) => {
         })
 })
 
-router.get('/:id', validateItemId, (req, res) => {
+router.get('/:id', isAdmin, validateItemId, (req, res) => {
     const id = req.params.id
     orders.findById(id)
         .then(item => {
@@ -28,7 +37,7 @@ router.get('/:id', validateItemId, (req, res) => {
         })
 })
 
-router.post('/', validatePostReqBody, (req, res) => {
+router.post('/', verifyToken, validatePostReqBody, (req, res) => {
     const item = req.body
     orders.add(item)
         .then(id => {
@@ -43,10 +52,19 @@ router.post('/', validatePostReqBody, (req, res) => {
         })
 })
 
-router.put('/:id', validateItemId, (req, res) => {
+router.put('/:id', isAdmin, validateItemId, (req, res) => {
     const id = req.params.id
     const updated = req.body
-    orders.edit(id, updated)
+    orders.findById(id)
+        .then(item => {
+            console.log(item.status)
+            if (item.status === 'preparando') {
+                throw new InvalidStatus()
+            }
+        })
+        .then(_ => {
+            return orders.edit(id, updated)
+        })
         .then(updatedItemId => {
             [updatedItemId] = updatedItemId
             return orders.findById(updatedItemId['id'])
@@ -55,12 +73,15 @@ router.put('/:id', validateItemId, (req, res) => {
             res.status(201).json(updated)
         })
         .catch(err => {
-            console.log(err)
+            if (err.name == "InvalidStatus") {
+                res.status(401).json({ message: 'Order cannot be canceled.' })
+                return;
+            }
             res.status(500).json({ message: 'Error updating the item.' })
         })
 })
 
-router.delete('/:id', validateItemId, (req, res) => {
+router.delete('/:id', verifyToken, validateItemId, (req, res) => {
     const id = req.params.id
     orders.remove(id)
         .then(deleted => {

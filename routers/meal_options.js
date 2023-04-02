@@ -2,21 +2,21 @@ const router = require('express').Router();
 const mealOptions = require('../models/meal_options.js');
 const {
     validateItemId,
-    validatePostReqBody
+    validatePostReqBody,
+    isAdmin,
 } = require('../api/middleware.js')
 
-router.get('/', (req, res) => {
+router.get('/', isAdmin, (req, res) => {
     mealOptions.find()
         .then(mealOptions => {
             res.status(200).json(mealOptions)
         })
         .catch(err => {
             res.status(500).json({ message: 'Error retrieving the mealOptions.' })
-            console.log(err)
         })
 })
 
-router.get('/:id', validateItemId, (req, res) => {
+router.get('/:id', isAdmin, validateItemId, (req, res) => {
     const id = req.params.id
     mealOptions.findById(id)
         .then(item => {
@@ -24,11 +24,10 @@ router.get('/:id', validateItemId, (req, res) => {
         })
         .catch(err => {
             res.status(500).json({ message: 'Error retrieving the item.' })
-            console.log(err)
         })
 })
 
-router.post('/', validatePostReqBody, (req, res) => {
+router.post('/', isAdmin, validatePostReqBody, (req, res) => {
     const item = req.body
     mealOptions.add(item)
         .then(id => {
@@ -59,7 +58,7 @@ router.put('/:id', validateItemId, (req, res) => {
         })
 })
 
-router.delete('/:id', validateItemId, (req, res) => {
+router.delete('/:id', isAdmin, validateItemId, (req, res) => {
     const id = req.params.id
     mealOptions.remove(id)
         .then(deleted => {
