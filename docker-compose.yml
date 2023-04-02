@@ -1,0 +1,16 @@
+version: '3.5'
+services:
+  database:
+    image: 'postgres:11'
+    env_file:
+      - .env
+    networks:
+      - postgres-network
+    volumes:
+      - $HOME/docker/volumes/postgres11:/var/lib/postgresql/data
+    ports:
+      - "15432:5432"
+
+networks:
+  postgres-network:
+    driver: bridge
