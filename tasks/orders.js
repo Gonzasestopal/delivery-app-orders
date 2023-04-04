@@ -4,13 +4,13 @@ const utils = require('../utils.js');
 
 function verifyRecentlyAddedOrders() {
   cron.schedule('*/10 * * * * *', () => {
-    return orders.findRecentlyAddedOrders()
+    return orders.findReadyOrders()
       .then(function(items) {
         return items.filter(utils.filterRecentlyAddedOrders);
         })
       .then(function(items) {
         const ids = items.map(function(order) {return order.id})
-        return orders.updateRecentlyAddedOrders(ids);
+        return orders.updateReadyOrders(ids);
       })
       .catch(function(err){
         console.log(err)

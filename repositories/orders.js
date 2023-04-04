@@ -7,8 +7,8 @@ module.exports = {
     edit,
     remove,
     findAllByUserId,
-    updateRecentlyAddedOrders,
-    findRecentlyAddedOrders,
+    updateReadyOrders,
+    findReadyOrders,
 }
 
 function find() {
@@ -36,11 +36,11 @@ function findAllByUserId(userId) {
     return db('orders').where('user_id', userId);
 }
 
-function updateRecentlyAddedOrders(ids) {
+function updateReadyOrders(ids) {
     console.log(ids)
-    return db('orders').update('status', 'preparando').whereIn('id', ids);
+    return db('orders').update('status', 'entregado').whereIn('id', ids);
 }
 
-function findRecentlyAddedOrders()  {
-    return db('orders').where('status', 'added')
+function findReadyOrders()  {
+    return db('orders').where('status', 'preparando')
 }
