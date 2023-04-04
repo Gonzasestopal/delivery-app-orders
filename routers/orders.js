@@ -39,8 +39,8 @@ router.get('/:id', isAdmin, validateItemId, (req, res) => {
 
 router.post('/', verifyToken, (req, res) => {
 	const meal_id = req.body.meal_id
-
 	const user = req.user
+	const now = new Date()
 
 	if (!(meal_id)) {
 		res.status(400).send("All input is required");
