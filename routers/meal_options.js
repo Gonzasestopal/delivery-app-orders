@@ -27,8 +27,14 @@ router.get('/:id', isAdmin, validateItemId, (req, res) => {
         })
 })
 
-router.post('/', isAdmin, validatePostReqBody, (req, res) => {
+router.post('/', isAdmin, (req, res) => {
     const item = req.body
+
+    if (!(item.name && item.price && item.meal_id)) {
+		res.status(400).send("All input is required");
+		return;
+    }
+
     mealOptions.add(item)
         .then(id => {
             [newItemId] = id
