@@ -5,6 +5,7 @@ const {
   validatePostReqBody,
   verifyToken,
   isAdmin,
+  verifyCategory,
 } = require('../api/middleware.js')
 
 router.get('/', verifyToken, (req, res) => {
@@ -28,8 +29,9 @@ router.get('/:id', isAdmin, validateItemId, (req, res) => {
     })
 })
 
-router.post('/', isAdmin, validatePostReqBody, (req, res) => {
+router.post('/', isAdmin, validatePostReqBody, verifyCategory, (req, res) => {
   const item = req.body
+
   meals.add(item)
     .then(id => {
       [newItemId] = id

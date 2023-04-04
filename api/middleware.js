@@ -2,6 +2,8 @@ const db = require('../api/db-config.js');
 const meals = require('../repositories/meals.js');
 const jwt = require('jsonwebtoken')
 
+const { Categories } = require('../api/resources.js');
+
 
 const config = process.env;
 
@@ -11,6 +13,7 @@ module.exports = {
 	validatePostReqBody,
 	isAdmin,
 	verifyToken,
+	verifyCategory,
 }
 
 function validateItemId(req, res, next) {
@@ -83,3 +86,13 @@ function verifyToken(req, res, next) {
 };
 
 
+function verifyCategory(req, res, next) {
+	const category = req.body.category
+	const is_valid = Object.values(Categories).includes(category);
+
+	if (!is_valid) {
+		res.status(400).json({ message: 'Invalid category.' })
+	}
+
+	return next()
+}
