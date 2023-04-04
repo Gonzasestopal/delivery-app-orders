@@ -9,8 +9,22 @@ module.exports = {
     remove
 }
 
-function find() {
-    return db('meals')
+function find(name, category, sortBy) {
+    let dbQuery = db('meals')
+
+    if (name) {
+        dbQuery.where({'name': name})
+    }
+
+    if (category) {
+        dbQuery.where({'category': category})
+    }
+
+    if (sortBy) {
+        dbQuery.orderBy(sortBy)
+    }
+
+    return dbQuery
 }
 
 function findById(id) {

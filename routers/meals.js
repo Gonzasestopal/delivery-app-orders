@@ -8,7 +8,11 @@ const {
 } = require('../api/middleware.js')
 
 router.get('/', verifyToken, (req, res) => {
-  meals.find()
+  let sort = req.query.sort;
+  let filterByCategoryParam = req.query.category;
+  let filterByNameParam = req.query.name
+
+  meals.find(filterByNameParam, filterByCategoryParam, sort)
     .then(meals => {
       res.status(200).json(meals)
     })
