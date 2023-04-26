@@ -1,20 +1,15 @@
 const router = require('express').Router();
 const orders = require('../repositories/orders.js');
 const meals = require('../repositories/meals.js');
+const { InvalidStatus } = require('../api/errors.js');
 const mealOptions = require('../repositories/meal_options.js')
+const { Statuses, UserStatuses } = require('../api/resources.js');
 const {
 	validateItemId,
 	verifyToken,
 	isAdmin,
 } = require('../api/middleware.js')
 const utils = require('../utils.js')
-
-class InvalidStatus extends Error {
-	constructor(message) {
-		super(message);
-		this.name = "InvalidStatus";
-	}
-}
 
 router.get('/', isAdmin, (req, res) => {
 	orders.find()
@@ -47,7 +42,7 @@ router.post('/', verifyToken, (req, res) => {
 		return;
 	}
 
-	if (user.status == 'inactive') {
+	if (user.status == UserStatuses.Inactive) {
 		res.status(403).json({ message: 'Invalid user status.' });
 		return;
 	}
@@ -67,7 +62,7 @@ router.post('/', verifyToken, (req, res) => {
 			return orders.add({
 				meal_id: meal_id,
 				user_id: user.id,
-				status: 'added'
+				status: Statuses.Preparando,
 			})
 		})
 		.then(id => {
@@ -173,7 +168,7 @@ router.put('/:id', isAdmin, validateItemId, (req, res) => {
 	const updated = req.body
 	orders.findById(id)
 		.then(item => {
-			if (item.status === 'preparando') {
+			if (item.status === Statuses.Preparando) {
 				throw new InvalidStatus()
 			}
 		})
