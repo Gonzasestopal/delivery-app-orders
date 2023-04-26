@@ -35,6 +35,10 @@
 
 ## GET  /api/meals
 
+You can filter by name and  category `?name=taco` or `?category=bebida`.
+
+You can sort ascending by name, or category and price `?sort=category` or `sort=name` or `sort=price`.
+
 Returns an array of item objects:
 ```json
 [
