@@ -6,6 +6,7 @@
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Tests](#tests)
 - [Deployment](#deployment)
 
 ## Prerequisites
@@ -19,6 +20,10 @@
 ## Usage
 
 - Run `npm run server` to start the local development server.
+
+## Tests
+
+- Run `npm test` to verify tests are working.
 
 ## Deployment
 

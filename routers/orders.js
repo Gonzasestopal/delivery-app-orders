@@ -3,6 +3,8 @@ const orders = require('../repositories/orders.js');
 const meals = require('../repositories/meals.js');
 const { InvalidStatus } = require('../api/errors.js');
 const mealOptions = require('../repositories/meal_options.js')
+const users = require('../repositories/users.js');
+const getNotifier = require('../notifications/factory.js').getNotifier
 const { Statuses, UserStatuses } = require('../api/resources.js');
 const {
 	validateItemId,
@@ -36,6 +38,7 @@ router.post('/', verifyToken, (req, res) => {
 	const meal_id = req.body.meal_id
 	const user = req.user
 	const now = new Date()
+	let orderId = null;
 
 	if (!(meal_id)) {
 		res.status(400).send("All input is required");
@@ -67,7 +70,20 @@ router.post('/', verifyToken, (req, res) => {
 		})
 		.then(id => {
 			[newItemId] = id
-			return orders.findById(newItemId['id'])
+			orderId = newItemId['id']
+			return users.findById(user.id)
+		})
+		.then(user => {
+			notifier = getNotifier()
+			notifier.send(user.email)
+			return users.findSuperAdmin()
+		})
+		.then(superAdmin => {
+			notifier = getNotifier()
+			return notifier.send(superAdmin.email)			
+		})
+		.then(_ => {
+			return orders.findById(orderId)
 		})
 		.then(item => {
 			res.status(201).json({ message: 'Successfully added the item.', item })
