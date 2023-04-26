@@ -7,7 +7,7 @@ function areWorkingHours(date) {
     closing = new Date()
     closing.setHours('22')
 
-    return opening >= date >= closing
+    return opening >= date >= closing || process.env.STAGE == 'development'
 }
 
 function calculateTotals(mealOptionsTotal, mealsTotal, tip) {

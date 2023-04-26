@@ -6,6 +6,7 @@
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Tests](#tests)
 - [Deployment](#deployment)
 
 ## Prerequisites
@@ -20,6 +21,10 @@
 
 - Run `npm run server` to start the local development server.
 
+## Tests
+
+- Run `npm test` to verify tests are working.
+
 ## Deployment
 
 - Run `docker build . -t delivery-app-orders`
@@ -29,6 +34,10 @@
 # API Documentation
 
 ## GET  /api/meals
+
+You can filter by name and  category `?name=taco` or `?category=bebida`.
+
+You can sort ascending by name, or category and price `?sort=category` or `sort=name` or `sort=price`.
 
 Returns an array of item objects:
 ```json

@@ -1,20 +1,17 @@
 const router = require('express').Router();
 const orders = require('../repositories/orders.js');
 const meals = require('../repositories/meals.js');
+const { InvalidStatus } = require('../api/errors.js');
 const mealOptions = require('../repositories/meal_options.js')
+const users = require('../repositories/users.js');
+const getNotifier = require('../notifications/factory.js').getNotifier
+const { Statuses, UserStatuses } = require('../api/resources.js');
 const {
 	validateItemId,
 	verifyToken,
 	isAdmin,
 } = require('../api/middleware.js')
 const utils = require('../utils.js')
-
-class InvalidStatus extends Error {
-	constructor(message) {
-		super(message);
-		this.name = "InvalidStatus";
-	}
-}
 
 router.get('/', isAdmin, (req, res) => {
 	orders.find()
@@ -41,13 +38,14 @@ router.post('/', verifyToken, (req, res) => {
 	const meal_id = req.body.meal_id
 	const user = req.user
 	const now = new Date()
+	let orderId = null;
 
 	if (!(meal_id)) {
 		res.status(400).send("All input is required");
 		return;
 	}
 
-	if (user.status == 'inactive') {
+	if (user.status == UserStatuses.Inactive) {
 		res.status(403).json({ message: 'Invalid user status.' });
 		return;
 	}
@@ -67,12 +65,25 @@ router.post('/', verifyToken, (req, res) => {
 			return orders.add({
 				meal_id: meal_id,
 				user_id: user.id,
-				status: 'added'
+				status: Statuses.Preparando,
 			})
 		})
 		.then(id => {
 			[newItemId] = id
-			return orders.findById(newItemId['id'])
+			orderId = newItemId['id']
+			return users.findById(user.id)
+		})
+		.then(user => {
+			notifier = getNotifier()
+			notifier.send(user.email)
+			return users.findSuperAdmin()
+		})
+		.then(superAdmin => {
+			notifier = getNotifier()
+			return notifier.send(superAdmin.email)			
+		})
+		.then(_ => {
+			return orders.findById(orderId)
 		})
 		.then(item => {
 			res.status(201).json({ message: 'Successfully added the item.', item })
@@ -173,7 +184,7 @@ router.put('/:id', isAdmin, validateItemId, (req, res) => {
 	const updated = req.body
 	orders.findById(id)
 		.then(item => {
-			if (item.status === 'preparando') {
+			if (item.status === Statuses.Preparando) {
 				throw new InvalidStatus()
 			}
 		})
