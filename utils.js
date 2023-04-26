@@ -18,8 +18,16 @@ function calculateTotals(mealOptionsTotal, mealsTotal, tip) {
     return { subtotal, subtotalTip, total }
 }
 
+function filterRecentlyAddedOrders(order) {
+    const now = new Date()
+    const diff = now - order.created_at;
+    return (diff / 60000) >= 5;
+
+}
+
 
 module.exports = {
     areWorkingHours,
     calculateTotals,
+    filterRecentlyAddedOrders,
 }

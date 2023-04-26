@@ -25,6 +25,7 @@
     "helmet": "^3.21.2",
     "jsonwebtoken": "^9.0.0",
     "knex": "^2.4.2",
+    "node-cron": "^3.0.2",
     "nodemailer": "^6.9.1",
     "pg": "^8.10.0"
   },
